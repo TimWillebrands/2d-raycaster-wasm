@@ -69,9 +69,14 @@ document.getElementById('controls')
 function draw(ev){
     ev.preventDefault()
     ev.stopPropagation()
+
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;   // Horizontal scale factor
+    const scaleY = canvas.height / rect.height; // Vertical scale factor
+    const x = (event.clientX - rect.left) * scaleX;
+    const y = (event.clientY - rect.top) * scaleY;
+
     if(ev.buttons === 1 || ev.buttons === 2){
-        const x = Math.floor(ev.offsetX / 450 * 180)
-        const y = Math.floor(ev.offsetY / 450 * 180)
         if(x < 0 || x >= 180 || y < 0 || y >= 180) return;
 
         const pixel = ev.buttons === 1 ? blackPixel : transPixel
@@ -81,8 +86,6 @@ function draw(ev){
         update(form.get('x'), form.get('y'), form.get('radius'))
     }
     if(ev.buttons === 4){
-        const x = Math.floor(ev.offsetX / 450 * 180)
-        const y = Math.floor(ev.offsetY / 450 * 180)
         if(x < 0 || x >= 180 || y < 0 || y >= 180) return;
         update(x, y, form.get('radius'))
     }
