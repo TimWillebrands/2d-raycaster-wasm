@@ -1,10 +1,7 @@
 const canvas = document.getElementById('game')
 const ctx = canvas.getContext('2d')
 const wallsCanvas = document.getElementById('walls')
-const wallsCtx = wallsCanvas.getContext('2d', {willReadFrequently: true})
-
-const blackPixel = new ImageData(new Uint8ClampedArray([255,255,255,255]),1)
-const transPixel = new ImageData(new Uint8ClampedArray([255,255,255,0]),1)
+const wallsCtx = wallsCanvas.getContext('2d')
 
 const env = {
     IsBlocked: function (srcX, srcY, tarX, tarY) {
@@ -79,8 +76,12 @@ function draw(ev){
     if(ev.buttons === 1 || ev.buttons === 2){
         if(x < 0 || x >= 180 || y < 0 || y >= 180) return;
 
-        const pixel = ev.buttons === 1 ? blackPixel : transPixel
-        wallsCtx.putImageData(pixel, x, y)
+        const pixel = ev.buttons === 1 ? 255 : 0 
+        const canvasPtr = wasm.instance.exports.toggleBlock(x, y, pixel)
+        const mem = wasm.instance.exports.memory.buffer
+        const cells = new Uint8ClampedArray(mem, canvasPtr, 180*180*4)
+        const imageData = new ImageData(cells, 180, 180)
+        wallsCtx.putImageData(imageData, 0, 0)
 
         const form = new FormData(document.getElementById('controls'))
         update(form.get('x'), form.get('y'), form.get('radius'))

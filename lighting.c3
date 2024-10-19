@@ -22,6 +22,7 @@ const PtI DOWN = {0,-1};
 
 PtIList [ANGLES][DIST] all_rays;
 Color[CELLS_PER_ROW*CELLS_PER_ROW] canvas;
+Color[CELLS_PER_ROW][CELLS_PER_ROW] blockers;
 CharLightMap light_map;
 
 struct Light
@@ -52,7 +53,7 @@ fn Color* Light.update(Light* self) {
 
         PtI curr = cell + self.pos; 
         PtI prev = ray::step(<short>)(curr, self.pos); // Go back one tile towards origin
-        if(check_blocked(prev.x, prev.y, curr.x, curr.y))
+        if(check_blocked2(prev.x, prev.y, curr.x, curr.y))
         {
             PtI p,n;
 
@@ -183,6 +184,15 @@ fn void init() @extern("init") @wasm
             cells.push(pt);
         }
     }
+}
+
+fn Color* toggle_block(usz x, usz y, char val) @extern("toggleBlock") @wasm {
+    blockers[y][x] = {255,255,255,val};
+    return &blockers[0][0];
+}
+
+fn bool check_blocked2(short x0, short y0, short x1, short y1) {
+    return blockers[y1][x1].a > 0;
 }
 
 def PtI = short[<2>];
